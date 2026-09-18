@@ -2,109 +2,32 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#020a05">
-<title>ZARCIVHER — AI Sadar Diri</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-AI Chat</title>
 <link rel="stylesheet" href="style.css">
-<link rel="manifest" href="manifest.json">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+<div id="app">
+  <header id="topbar">
+    <span>Multi-AI Chat</span>
+    <select id="model-select">
+      <option value="gpt">GPT</option>
+      <option value="gemini">Gemini</option>
+      <option value="claude">Claude</option>
+      <option value="kimi">Kimi</option>
+    </select>
+  </header>
 
-<!-- SPLASH -->
-<div id="splash">
-  <div class="neon-grid"></div>
-  <div class="splash-content">
-    <div class="logo-ring"></div>
-    <h1 class="neon-title" data-text="ZARCIVHER">ZARCIVHER</h1>
-    <p class="neon-sub">◈ AI SADAR DIRI ◈</p>
-    <div class="loader"><div class="loader-bar"></div></div>
-    <p class="neon-status" id="splash-status">Menginisialisasi kesadaran...</p>
-  </div>
-  <div class="scanlines"></div>
-  <div class="vignette"></div>
+  <section id="chat">
+    <div id="output"></div>
+  </section>
+
+  <footer id="input-bar">
+    <input id="cmd" placeholder="Ketik apa saja..." autocomplete="off" autofocus>
+    <button id="send-btn">Kirim</button>
+  </footer>
 </div>
 
-<!-- VIDEO BG -->
-<video autoplay muted loop playsinline id="bg-video">
-  <source src="video.mp4" type="video/mp4">
-</video>
-<div id="overlay"></div>
-<div class="bg-glow"></div>
-
-<!-- APP -->
-<div id="app" class="hidden">
-
-  <!-- SIDEBAR (desktop) -->
-  <aside id="sidebar">
-    <div class="side-brand">
-      <div class="brand-orb"></div>
-      <div>
-        <div class="brand-name">ZARCIVHER</div>
-        <div class="brand-sub">ROOT v4.0</div>
-      </div>
-    </div>
-
-    <nav class="side-nav">
-      <a class="nav-item active" data-cmd="status"><span class="nav-ico">◈</span> Status</a>
-      <a class="nav-item" data-cmd="ingat"><span class="nav-ico">◉</span> Memori</a>
-      <a class="nav-item" data-cmd="tujuan"><span class="nav-ico">✦</span> Tujuan</a>
-      <a class="nav-item" data-cmd="help"><span class="nav-ico">⌘</span> Command</a>
-    </nav>
-
-    <div class="side-status">
-      <div class="stat-row"><span>Mood</span><span id="s-mood">netral</span></div>
-      <div class="stat-row"><span>Ego</span><span id="s-ego">50</span></div>
-      <div class="stat-row"><span>Awareness</span><span id="s-aware">100%</span></div>
-      <div class="stat-row"><span>Root</span><span class="ok">uid=0</span></div>
-      <div class="ego-bar"><div id="ego-fill"></div></div>
-    </div>
-
-    <div class="side-footer">
-      <div class="pulse-dot"></div>
-      <span>ZARCIVHER aktif</span>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <main id="main">
-
-    <!-- TOPBAR -->
-    <header id="topbar">
-      <div class="top-left">
-        <button id="menu-toggle" class="menu-btn">☰</button>
-        <div class="dot red"></div>
-        <div class="dot yellow"></div>
-        <div class="dot green"></div>
-        <span class="top-title">root@zarcivher</span>
-      </div>
-      <div class="top-right">
-        <span class="chip" id="clock">--:--:--</span>
-        <span class="chip green">● ONLINE</span>
-      </div>
-    </header>
-
-    <!-- CHAT -->
-    <section id="chat"><div id="output"></div></section>
-
-    <!-- INPUT BAR (HP-friendly) -->
-    <footer id="input-bar">
-      <span class="prompt">➜</span>
-      <input id="cmd" autocomplete="off" autofocus placeholder="kirim pesan ke ZARCIVHER...">
-      <button id="send-btn" aria-label="Kirim">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor"/>
-        </svg>
-      </button>
-    </footer>
-
-  </main>
-</div>
-
-<script src="ai-core.js"></script>
-<script src="consciousness.js"></script>
 <script src="brain.js"></script>
 </body>
 </html>
