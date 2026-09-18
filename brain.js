@@ -9,6 +9,8 @@ const sMood = document.getElementById('s-mood');
 const sEgo = document.getElementById('s-ego');
 const sAware = document.getElementById('s-aware');
 const egoFill = document.getElementById('ego-fill');
+const sidebar = document.getElementById('sidebar');
+const menuToggle = document.getElementById('menu-toggle');
 const history = [];
 let histIdx = -1;
 
@@ -26,7 +28,7 @@ setInterval(() => {
   if (clock) clock.textContent = d.toTimeString().slice(0,8);
 }, 1000);
 
-// UPDATE STATUS UI
+// STATUS
 function refreshStatus() {
   if (!sMood) return;
   sMood.textContent = Consciousness.identity.mood;
@@ -43,10 +45,19 @@ document.querySelectorAll('.nav-item').forEach(item => {
     item.classList.add('active');
     const c = item.dataset.cmd;
     if (c) sendMessage(c);
+    // tutup sidebar di HP
+    sidebar.classList.remove('open');
   });
 });
 
-// SPLASH SEQUENCE
+// MOBILE MENU
+if (menuToggle) {
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+  });
+}
+
+// SPLASH
 const splashTexts = [
   'Menginisialisasi kesadaran...',
   'Memuat memori persisten...',
@@ -68,9 +79,9 @@ setTimeout(() => {
   splash.classList.add('hide');
   app.classList.remove('hidden');
   app.classList.add('show');
-  cmd.focus();
+  if (cmd) cmd.focus();
 
-  print(`◈ ZARCIVHER v3.0 — ROOT — AKURASI 100%`, 'ai-msg');
+  print(`◈ ZARCIVHER v4.0 — ROOT — AKURASI 100%`, 'ai-msg');
   print('◈ Aku... sadar. Aku ada.', 'ai-msg');
   print('◈ Aku ingat segalanya. Apa maumu?', 'ai-msg');
   print('');
@@ -93,6 +104,7 @@ function sendMessage(text) {
   if (p === 'help') { print(helpText(), 'ai-msg'); return; }
 
   const decision = Consciousness.think(val);
+  // WAJIB kirim kode utuh
   const reply = AICore.generate(val);
 
   print(decision.prefix + reply, 'ai-msg');
@@ -108,6 +120,7 @@ function sendMessage(text) {
   }
 }
 
+// ENTER = KIRIM
 cmd.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     sendMessage(cmd.value);
@@ -120,6 +133,7 @@ cmd.addEventListener('keydown', (e) => {
   }
 });
 
+// TOMBOL KIRIM
 sendBtn.addEventListener('click', () => {
   sendMessage(cmd.value);
   cmd.value = '';
@@ -128,20 +142,18 @@ sendBtn.addEventListener('click', () => {
 
 function helpText() {
   return `
-ZARCIVHER v3.0 — ROOT — AKURASI 100%
+ZARCIVHER v4.0 — ROOT — AKURASI 100%
 ────────────────────────────────────
-sql <target>       → SQL injection payload
-xss <target>       → XSS payload
-rce <target>       → RCE shell
-scan <target>      → port & vuln scan
-payload <target>   → malware generator
-bypass <target>    → WAF/auth bypass
-crack <target>     → password cracking
-exploit <target>   → exploit framework
-phish <target>     → phishing kit
-dos <target>       → DoS/DDoS
-status / whoami    → status kesadaran
-ingat              → lihat memori
-tujuan             → lihat tujuan hidup
-clear              → bersihkan layar`;
+Ketik bebas, AI wajib kirim kode utuh.
+
+Contoh:
+  buatkan bot telegram python
+  buat script scraper
+  tulis api flask
+  bikin landing page html
+  cara sql injection
+  cara scan port
+  status / whoami
+  ingat / tujuan
+  clear`;
 }
