@@ -558,3 +558,20 @@ html, body {
     padding-bottom:max(10px, env(safe-area-inset-bottom));
   }
 }
+/* TAMBAHKAN di paling bawah style.css */
+
+.typing {
+  color:#00ff88 !important;
+  opacity:0.7;
+  font-style:italic;
+  animation:typingPulse 1.2s ease-in-out infinite;
+}
+@keyframes typingPulse {
+  0%,100% { opacity:0.5; }
+  50%     { opacity:1; }
+}
+
+@media (max-width:768px) {
+  #chat { padding:12px 10px; }
+  #output div { padding:10px 12px; font-size:13px; line-height:1.55; }
+}
