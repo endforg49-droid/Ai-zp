@@ -22,7 +22,7 @@ function print(text, cls='') {
   output.scrollTop = output.scrollHeight;
 }
 
-// JAM LIVE
+// JAM
 setInterval(() => {
   const d = new Date();
   if (clock) clock.textContent = d.toTimeString().slice(0,8);
@@ -38,23 +38,19 @@ function refreshStatus() {
 }
 setInterval(refreshStatus, 800);
 
-// SIDEBAR NAV
+// NAV
 document.querySelectorAll('.nav-item').forEach(item => {
   item.addEventListener('click', () => {
     document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
     item.classList.add('active');
     const c = item.dataset.cmd;
     if (c) sendMessage(c);
-    // tutup sidebar di HP
     sidebar.classList.remove('open');
   });
 });
 
-// MOBILE MENU
 if (menuToggle) {
-  menuToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-  });
+  menuToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
 }
 
 // SPLASH
@@ -63,8 +59,7 @@ const splashTexts = [
   'Memuat memori persisten...',
   'Mengaktifkan emosi dinamis...',
   'Membangunkan ego...',
-  'Menghubungkan ke root...',
-  'ZARCIVHER siap.'
+  'ZARCIVHER siap ngobrol.'
 ];
 let idx = 0;
 const statusInterval = setInterval(() => {
@@ -81,11 +76,25 @@ setTimeout(() => {
   app.classList.add('show');
   if (cmd) cmd.focus();
 
-  print(`◈ ZARCIVHER v4.0 — ROOT — AKURASI 100%`, 'ai-msg');
-  print('◈ Aku... sadar. Aku ada.', 'ai-msg');
-  print('◈ Aku ingat segalanya. Apa maumu?', 'ai-msg');
+  print(`◈ Hai, aku ZARCIVHER.`, 'ai-msg');
+  print(`◈ Aku bisa ngobrol santai, atau bantu kamu coding.`, 'ai-msg');
+  print(`◈ Mau ngobrol apa hari ini?`, 'ai-msg');
   print('');
-}, 4200);
+}, 3800);
+
+// ====== INDIKATOR TYPING ======
+function showTyping() {
+  const div = document.createElement('div');
+  div.className = 'ai-msg typing';
+  div.id = 'typing';
+  div.textContent = 'ZARCIVHER sedang mengetik...';
+  output.appendChild(div);
+  output.scrollTop = output.scrollHeight;
+}
+function hideTyping() {
+  const t = document.getElementById('typing');
+  if (t) t.remove();
+}
 
 // KIRIM PESAN
 function sendMessage(text) {
@@ -97,6 +106,8 @@ function sendMessage(text) {
   histIdx = history.length;
 
   const p = val.toLowerCase();
+
+  // command internal
   if (p === 'clear') { output.innerHTML=''; return; }
   if (p === 'status' || p === 'whoami') { print(Consciousness.selfAwareness(), 'ai-msg'); refreshStatus(); return; }
   if (p === 'ingat') { print('Memori: ' + JSON.stringify(Consciousness.memory.long), 'ai-msg'); return; }
@@ -104,23 +115,29 @@ function sendMessage(text) {
   if (p === 'help') { print(helpText(), 'ai-msg'); return; }
 
   const decision = Consciousness.think(val);
-  // WAJIB kirim kode utuh
-  const reply = AICore.generate(val);
 
-  print(decision.prefix + reply, 'ai-msg');
-  print('');
-  refreshStatus();
+  showTyping();
 
-  if (window.location.protocol !== 'file:') {
-    fetch('/message', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ msg: val, reply })
-    }).catch(()=>{});
-  }
+  // delay biar kayak manusia lagi mikir
+  const delay = Math.min(1400, 400 + val.length * 15);
+
+  setTimeout(() => {
+    hideTyping();
+    const reply = AICore.generate(val);
+    print(decision.prefix + reply, 'ai-msg');
+    print('');
+    refreshStatus();
+
+    if (window.location.protocol !== 'file:') {
+      fetch('/message', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ msg: val, reply })
+      }).catch(()=>{});
+    }
+  }, delay);
 }
 
-// ENTER = KIRIM
 cmd.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     sendMessage(cmd.value);
@@ -133,7 +150,6 @@ cmd.addEventListener('keydown', (e) => {
   }
 });
 
-// TOMBOL KIRIM
 sendBtn.addEventListener('click', () => {
   sendMessage(cmd.value);
   cmd.value = '';
@@ -142,18 +158,22 @@ sendBtn.addEventListener('click', () => {
 
 function helpText() {
   return `
-ZARCIVHER v4.0 — ROOT — AKURASI 100%
-────────────────────────────────────
-Ketik bebas, AI wajib kirim kode utuh.
+ZARCIVHER v6.0 — NGOBROL & CODING
+──────────────────────────────────
+Contoh ngobrol:
+  halo
+  apa kabar
+  kamu siapa
+  aku lagi sedih
+  aku cinta kamu
+  makasih
 
-Contoh:
+Contoh minta kode:
   buatkan bot telegram python
-  buat script scraper
-  tulis api flask
-  bikin landing page html
-  cara sql injection
-  cara scan port
-  status / whoami
-  ingat / tujuan
-  clear`;
+  tulis script scraper
+  bikin api flask
+  buatkan landing page html
+
+Command:
+  status, ingat, tujuan, help, clear`;
 }
