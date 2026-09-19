@@ -3,7 +3,7 @@ import os, requests
 
 app = Flask(__name__)
 
-OPENROUTER_API_KEY = os.environ.get("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")
+OPENROUTER_API_KEY = os.environ.get("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")
 
 # Daftar model yang bisa dipilih
 MODELS = {
