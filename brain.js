@@ -3,6 +3,16 @@ const cmd = document.getElementById('cmd');
 const sendBtn = document.getElementById('send-btn');
 const modelSelect = document.getElementById('model-select');
 
+// MASUKKAN API KEY KAMU DI SINI
+const OPENROUTER_API_KEY = "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";
+
+const MODELS = {
+  gpt: "openai/gpt-4o-mini",
+  gemini: "google/gemini-flash-1.5",
+  claude: "anthropic/claude-3-haiku",
+  kimi: "moonshotai/kimi-k2"
+};
+
 function print(text, cls = '') {
   const div = document.createElement('div');
   div.className = cls;
@@ -33,21 +43,32 @@ async function sendMessage(text) {
   showTyping();
 
   try {
-    const res = await fetch('/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
-        message: val,
-        model: modelSelect.value
+        model: MODELS[modelSelect.value],
+        messages: [
+          { role: "system", content: "Kamu asisten AI ramah. Jawab bahasa Indonesia santai." },
+          { role: "user", content: val }
+        ]
       })
     });
 
     const data = await res.json();
     hideTyping();
-    print(data.reply, 'ai-msg');
+
+    if (data.choices && data.choices[0]) {
+      print(data.choices[0].message.content, 'ai-msg');
+    } else {
+      print("Error API: " + JSON.stringify(data), 'ai-msg');
+    }
   } catch (e) {
     hideTyping();
-    print('Error: ' + e.message, 'ai-msg');
+    print("Error: " + e.message, 'ai-msg');
   }
 }
 
