@@ -51,12 +51,12 @@
       </button>
       <div class="status-chip" id="apiStatus">
         <span class="dot"></span>
-        <span id="apiStatusText">API belum diatur</span>
+        <span id="apiStatusText">Memeriksa API...</span>
       </div>
     </div>
   </aside>
 
-  <!-- MAIN -->
+  <!-- MAIN STAGE -->
   <main class="stage">
 
     <!-- CHAT VIEW -->
@@ -70,7 +70,7 @@
         <div class="chat-empty" id="chatEmpty">
           <div class="empty-rule"></div>
           <h2>Selamat datang.</h2>
-          <p>Aurelia siap membantu kegiatan harianmu dan mahir dalam pemrograman Lua. Atur kunci API di Pengaturan untuk memulai.</p>
+          <p>Aurelia siap membantu kegiatan harianmu dan mahir dalam pemrograman Lua. Mulai ketik pesan di bawah untuk berkomunikasi.</p>
         </div>
         <div id="chatLog"></div>
       </div>
@@ -147,18 +147,19 @@ end</textarea>
     <section class="view" id="view-settings">
       <header class="view-head">
         <h1>Pengaturan</h1>
-        <p>Aurelia berjalan sepenuhnya di perangkatmu. Masukkan kunci Google Gemini API milikmu agar percakapan dapat aktif.</p>
+        <p>Kunci API bawaan sudah aktif secara otomatis. Kamu juga bisa memasukkan Kunci API Google Gemini pribadi milikmu sendiri jika ingin menggunakan kuota terpisah.</p>
       </header>
 
       <div class="settings-card">
-        <label class="field-label" for="apiKeyInput">Kunci API Google Gemini</label>
-        <input type="password" id="apiKeyInput" placeholder="AIzaSy...">
-        <p class="field-hint">Kunci disimpan hanya di localStorage peramban ini — tidak pernah dikirim ke server manapun selain googleapis.com. Dapatkan kunci gratis di <a href="https://aistudio.google.com/" target="_blank" rel="noopener">aistudio.google.com</a>.</p>
+        <label class="field-label" for="apiKeyInput">Kunci API Google Gemini (Opsional)</label>
+        <input type="password" id="apiKeyInput" placeholder="Kosongkan untuk menggunakan API Bawaan">
+        <p class="field-hint">Kosongkan kolom ini jika ingin menggunakan API bawaan web. Jika diisi, sistem akan menggunakan API Key milikmu sendiri. Dapatkan kunci gratis di <a href="https://aistudio.google.com/" target="_blank" rel="noopener">aistudio.google.com</a>.</p>
 
-        <label class="field-label" for="modelSelect">Model</label>
+        <label class="field-label" for="modelSelect">Model API</label>
         <select id="modelSelect">
-          <option value="gemini-2.5-flash">Gemini 2.5 Flash (Gratis & Sangat Cepat)</option>
-          <option value="gemini-2.5-pro">Gemini 2.5 Pro (Gratis & Lebih Cerdas)</option>
+          <option value="gemini-2.5-flash">Gemini 2.5 Flash (Sangat Cepat)</option>
+          <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+          <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
         </select>
 
         <label class="field-label" for="personaInput">Gaya kepribadian Aurelia</label>
@@ -175,7 +176,7 @@ end</textarea>
   </main>
 </div>
 
-<!-- Lua VM (Fengari) — loaded lazily, only needed for the sandbox -->
+<!-- Lua VM (Fengari) -->
 <script src="https://cdn.jsdelivr.net/npm/fengari-web@0.1.4/dist/fengari-web.js"></script>
 <script src="app.js"></script>
 </body>
