@@ -3,31 +3,179 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Multi-AI Chat</title>
-<link rel="stylesheet" href="style.css">
+<title>AURELIA — Asisten AI Pribadi</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div id="app">
-  <header id="topbar">
-    <span>Multi-AI Chat</span>
-    <select id="model-select">
-      <option value="gpt">GPT</option>
-      <option value="gemini">Gemini</option>
-      <option value="claude">Claude</option>
-      <option value="kimi">Kimi</option>
-    </select>
-  </header>
 
-  <section id="chat">
-    <div id="output"></div>
-  </section>
+<div class="app">
 
-  <footer id="input-bar">
-    <input id="cmd" placeholder="Ketik apa saja..." autocomplete="off" autofocus>
-    <button id="send-btn">Kirim</button>
-  </footer>
+  <!-- SIDEBAR -->
+  <aside class="rail">
+    <div class="rail-top">
+      <div class="brand">
+        <span class="brand-mark">A</span>
+        <span class="brand-word">AURELIA</span>
+      </div>
+      <div class="brand-sub">Asisten Kecerdasan Pribadi</div>
+    </div>
+
+    <nav class="rail-nav">
+      <button class="nav-item is-active" data-view="chat">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16v11H7l-3 3V5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+        <span>Percakapan</span>
+      </button>
+      <button class="nav-item" data-view="tasks">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M5 7h14M5 12h14M5 17h9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="3" cy="7" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="17" r="1" fill="currentColor"/></svg>
+        <span>Tugas Harian</span>
+      </button>
+      <button class="nav-item" data-view="notes">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M6 4h9l4 4v12H6V4z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 12h6M9 15h6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <span>Catatan</span>
+      </button>
+      <button class="nav-item" data-view="lua">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M5 6l5 6-5 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 18h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>Lua Sandbox</span>
+      </button>
+    </nav>
+
+    <div class="rail-bottom">
+      <button class="nav-item" data-view="settings">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span>Pengaturan</span>
+      </button>
+      <div class="status-chip" id="apiStatus">
+        <span class="dot"></span>
+        <span id="apiStatusText">API belum diatur</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="stage">
+
+    <!-- CHAT VIEW -->
+    <section class="view is-active" id="view-chat">
+      <header class="view-head">
+        <h1>Percakapan</h1>
+        <p>Tanyakan apa saja — jadwal, ide, keputusan sehari-hari, atau kode Lua.</p>
+      </header>
+
+      <div class="chat-scroll" id="chatScroll">
+        <div class="chat-empty" id="chatEmpty">
+          <div class="empty-rule"></div>
+          <h2>Selamat datang.</h2>
+          <p>Aurelia siap membantu kegiatan harianmu dan mahir dalam pemrograman Lua. Atur kunci API di Pengaturan untuk memulai.</p>
+        </div>
+        <div id="chatLog"></div>
+      </div>
+
+      <form class="composer" id="composerForm">
+        <textarea id="composerInput" placeholder="Tulis pesan untuk Aurelia…" rows="1"></textarea>
+        <button type="submit" id="sendBtn" aria-label="Kirim">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 12h15M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </form>
+    </section>
+
+    <!-- TASKS VIEW -->
+    <section class="view" id="view-tasks">
+      <header class="view-head">
+        <h1>Tugas Harian</h1>
+        <p>Daftar hal yang perlu diselesaikan hari ini. Tersimpan otomatis di perangkatmu.</p>
+      </header>
+
+      <form class="inline-form" id="taskForm">
+        <input type="text" id="taskInput" placeholder="Tambah tugas baru…" autocomplete="off">
+        <button type="submit">Tambah</button>
+      </form>
+
+      <ul class="task-list" id="taskList"></ul>
+      <p class="empty-hint" id="taskEmptyHint">Belum ada tugas. Tambahkan satu di atas.</p>
+    </section>
+
+    <!-- NOTES VIEW -->
+    <section class="view" id="view-notes">
+      <header class="view-head">
+        <h1>Catatan</h1>
+        <p>Ruang bebas untuk menulis apa saja yang ingin kamu ingat.</p>
+      </header>
+
+      <textarea class="notes-area" id="notesArea" placeholder="Mulai menulis…"></textarea>
+      <div class="notes-foot"><span id="notesSaved">Tersimpan</span></div>
+    </section>
+
+    <!-- LUA VIEW -->
+    <section class="view" id="view-lua">
+      <header class="view-head">
+        <h1>Lua Sandbox</h1>
+        <p>Tulis dan jalankan kode Lua langsung di peramban, atau minta Aurelia menjelaskan dan memperbaikinya.</p>
+      </header>
+
+      <div class="lua-grid">
+        <div class="lua-editor-wrap">
+          <div class="lua-toolbar">
+            <span>main.lua</span>
+            <div class="lua-toolbar-actions">
+              <button id="luaRunBtn" class="btn-ghost">Jalankan</button>
+              <button id="luaAskBtn" class="btn-ghost">Tanya Aurelia</button>
+            </div>
+          </div>
+          <textarea id="luaEditor" spellcheck="false">-- Tulis kode Lua di sini
+local function fib(n)
+  if n < 2 then return n end
+  return fib(n - 1) + fib(n - 2)
+end
+
+for i = 0, 10 do
+  print(i, fib(i))
+end</textarea>
+        </div>
+        <div class="lua-output-wrap">
+          <div class="lua-toolbar"><span>Hasil</span></div>
+          <pre class="lua-output" id="luaOutput">Tekan "Jalankan" untuk melihat hasil di sini.</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS VIEW -->
+    <section class="view" id="view-settings">
+      <header class="view-head">
+        <h1>Pengaturan</h1>
+        <p>Aurelia berjalan sepenuhnya di perangkatmu. Masukkan kunci API Anthropic milikmu sendiri agar percakapan dapat aktif.</p>
+      </header>
+
+      <div class="settings-card">
+        <label class="field-label" for="apiKeyInput">Kunci API Anthropic</label>
+        <input type="password" id="apiKeyInput" placeholder="sk-ant-...">
+        <p class="field-hint">Kunci disimpan hanya di localStorage peramban ini — tidak pernah dikirim ke server manapun selain api.anthropic.com. Dapatkan kunci di console.anthropic.com.</p>
+
+        <label class="field-label" for="modelSelect">Model</label>
+        <select id="modelSelect">
+          <option value="claude-sonnet-4-6">Claude Sonnet 4.6 (disarankan)</option>
+        </select>
+
+        <label class="field-label" for="personaInput">Gaya kepribadian Aurelia</label>
+        <textarea id="personaInput" rows="4" placeholder="Contoh: ringkas, hangat, dan proaktif menawarkan langkah berikutnya."></textarea>
+
+        <div class="settings-actions">
+          <button id="saveSettingsBtn" class="btn-primary">Simpan</button>
+          <button id="clearChatBtn" class="btn-ghost">Hapus riwayat percakapan</button>
+        </div>
+        <p class="save-msg" id="saveMsg"></p>
+      </div>
+    </section>
+
+  </main>
 </div>
 
-<script src="brain.js"></script>
+<!-- Lua VM (Fengari) — loaded lazily, only needed for the sandbox -->
+<script src="https://cdn.jsdelivr.net/npm/fengari-web@0.1.4/dist/fengari-web.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
