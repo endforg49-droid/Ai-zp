@@ -5,7 +5,7 @@
      MASUKKAN API KEY GOOGLE GEMINI UTAMA MILIKMU DI BAWAH INI.
      PENGGUNA BARU AKAN LANGSUNG BISA MEMAKAI WEB TANPA HARUS INPUT KEY.
      ========================================================================= */
-  const DEFAULT_API_KEY = "MASUKKAN_API_KEY_GEMINI_KAMU_DI_SINI";
+  const DEFAULT_API_KEY = "AQ.Ab8RN6JiMvGYWS_tZ2Lj-QG15Z0JrC8qz3CMiWJ2WLHXdT44TQ";
 
   /* ============ STORAGE HELPERS ============ */
   const store = {
