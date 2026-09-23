@@ -1,6 +1,12 @@
 (function () {
   "use strict";
 
+  /* =========================================================================
+     MASUKKAN API KEY GOOGLE GEMINI UTAMA MILIKMU DI BAWAH INI.
+     PENGGUNA BARU AKAN LANGSUNG BISA MEMAKAI WEB TANPA HARUS INPUT KEY.
+     ========================================================================= */
+  const DEFAULT_API_KEY = "MASUKKAN_API_KEY_GEMINI_KAMU_DI_SINI";
+
   /* ============ STORAGE HELPERS ============ */
   const store = {
     get(key, fallback) {
@@ -36,15 +42,17 @@
 
   /* ============ API STATUS ============ */
   function refreshApiStatus() {
-    const key = store.get(KEYS.apiKey, "");
+    const userKey = store.get(KEYS.apiKey, "");
+    const activeKey = userKey || DEFAULT_API_KEY;
     const chip = document.getElementById("apiStatus");
     const text = document.getElementById("apiStatusText");
-    if (key) {
+
+    if (activeKey && activeKey !== "MASUKKAN_API_KEY_GEMINI_KAMU_DI_SINI") {
       chip.classList.add("is-ready");
-      text.textContent = "API tersambung";
+      text.textContent = userKey ? "API Kustom Aktif" : "API Bawaan Aktif";
     } else {
       chip.classList.remove("is-ready");
-      text.textContent = "API belum diatur";
+      text.textContent = "API Belum Diatur";
     }
   }
 
@@ -129,10 +137,12 @@
 
   /* ============ CALL GOOGLE GEMINI API ============ */
   async function callGemini(userText) {
-    const apiKey = store.get(KEYS.apiKey, "");
+    const userKey = store.get(KEYS.apiKey, "");
+    const apiKey = userKey || DEFAULT_API_KEY;
     const model = store.get(KEYS.model, "gemini-2.5-flash");
     const persona = store.get(KEYS.persona, "");
-    if (!apiKey) {
+
+    if (!apiKey || apiKey === "MASUKKAN_API_KEY_GEMINI_KAMU_DI_SINI") {
       throw new Error("MISSING_KEY");
     }
 
