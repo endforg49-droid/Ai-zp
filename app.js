@@ -55,7 +55,7 @@
   const saveMsg = document.getElementById("saveMsg");
 
   apiKeyInput.value = store.get(KEYS.apiKey, "");
-  modelSelect.value = store.get(KEYS.model, "claude-sonnet-4-6");
+  modelSelect.value = store.get(KEYS.model, "gemini-2.5-flash");
   personaInput.value = store.get(KEYS.persona, "");
 
   document.getElementById("saveSettingsBtn").addEventListener("click", () => {
@@ -84,7 +84,7 @@
   const composerInput = document.getElementById("composerInput");
   const sendBtn = document.getElementById("sendBtn");
 
-  let history = store.get(KEYS.chat, []); // [{role:'user'|'assistant', content:'...'}]
+  let history = store.get(KEYS.chat, []);
 
   function escapeHtml(str) {
     return str.replace(/[&<>"']/g, c => ({
@@ -92,7 +92,6 @@
     }[c]));
   }
 
-  // Minimal markdown-ish rendering: fenced code blocks + inline code, paragraphs preserved via CSS white-space.
   function renderContent(text) {
     const escaped = escapeHtml(text);
     const withBlocks = escaped.replace(/```(\w*)\n([\s\S]*?)```/g, (m, lang, code) => {
@@ -128,32 +127,37 @@
     "Saat membahas Lua, tulis kode yang idiomatik, jelaskan trade-off singkat, dan gunakan blok kode berpagar (```lua ... ```). " +
     "Jawab dalam Bahasa Indonesia kecuali diminta lain, dengan gaya ringkas namun hangat.";
 
-  async function callAnthropic(userText) {
+  /* ============ CALL GOOGLE GEMINI API ============ */
+  async function callGemini(userText) {
     const apiKey = store.get(KEYS.apiKey, "");
-    const model = store.get(KEYS.model, "claude-sonnet-4-6");
+    const model = store.get(KEYS.model, "gemini-2.5-flash");
     const persona = store.get(KEYS.persona, "");
     if (!apiKey) {
       throw new Error("MISSING_KEY");
     }
 
-    const messages = history.map(m => ({ role: m.role, content: m.content }));
-    messages.push({ role: "user", content: userText });
+    const systemInstruction = persona 
+      ? SYSTEM_PROMPT_BASE + " Gaya tambahan yang diminta pengguna: " + persona 
+      : SYSTEM_PROMPT_BASE;
 
-    const system = persona ? SYSTEM_PROMPT_BASE + " Gaya tambahan yang diminta pengguna: " + persona : SYSTEM_PROMPT_BASE;
+    const contents = history.map(m => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }]
+    }));
+    contents.push({ role: "user", parts: [{ text: userText }] });
 
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+    const res = await fetch(endpoint, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true"
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: model,
-        max_tokens: 1500,
-        system: system,
-        messages: messages
+        systemInstruction: {
+          parts: [{ text: systemInstruction }]
+        },
+        contents: contents
       })
     });
 
@@ -164,10 +168,7 @@
     }
 
     const data = await res.json();
-    const text = (data.content || [])
-      .filter(b => b.type === "text")
-      .map(b => b.text)
-      .join("\n");
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     return text || "(tidak ada respons teks)";
   }
 
@@ -184,7 +185,7 @@
 
     sendBtn.disabled = true;
     try {
-      const reply = await callAnthropic(text);
+      const reply = await callGemini(text);
       thinkingEl.remove();
       history.push({ role: "assistant", content: reply });
       store.set(KEYS.chat, history);
@@ -193,12 +194,11 @@
       thinkingEl.remove();
       let msg;
       if (err.message === "MISSING_KEY") {
-        msg = "Kunci API belum diatur. Buka Pengaturan untuk memasukkan kunci API Anthropic milikmu.";
+        msg = "Kunci API belum diatur. Buka Pengaturan untuk memasukkan Google Gemini API Key milikmu.";
       } else {
         msg = "Terjadi kesalahan saat menghubungi API: " + err.message;
       }
       addMessageToDOM("assistant", msg);
-      // don't persist the error as real history
       history.pop();
       store.set(KEYS.chat, history);
     } finally {
@@ -233,7 +233,7 @@
   const taskList = document.getElementById("taskList");
   const taskEmptyHint = document.getElementById("taskEmptyHint");
 
-  let tasks = store.get(KEYS.tasks, []); // [{id, label, done}]
+  let tasks = store.get(KEYS.tasks, []);
 
   function renderTasks() {
     taskList.innerHTML = "";
@@ -342,7 +342,6 @@
     const code = luaEditor.value.trim();
     if (!code) return;
     const prompt = "Tolong jelaskan, dan jika perlu perbaiki, kode Lua berikut:\n```lua\n" + code + "\n```";
-    // switch to chat view
     document.querySelector('.nav-item[data-view="chat"]').click();
     composerInput.value = prompt;
     composerForm.requestSubmit();
